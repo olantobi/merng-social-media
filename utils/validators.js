@@ -50,12 +50,16 @@ module.exports.validateLoginInput = (username, password) => {
     }
 }
 
-module.exports.validateObjectId = (objectId) => {
+module.exports.validateObjectId = (...objectIds) => {
     const errors = {};
 
-    if (!Types.ObjectId.isValid(objectId)) {
-        errors.id = 'Invalid id provided';
-    }
+    for (let objectId of objectIds) {
+        if (!Types.ObjectId.isValid(objectId)) {
+            console.log(objectId, ' is invalid');
+            errors.id = 'Invalid id provided';
+            break;
+        }
+    } 
 
     return {
         errors, 

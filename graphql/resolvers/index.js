@@ -1,5 +1,6 @@
 const postResolvers = require('./posts');
 const userResolvers = require('./users');
+const commentResolvers = require('./comments');
 
 module.exports = {
     Query: {
@@ -8,6 +9,7 @@ module.exports = {
     },
     Mutation: {
         ...postResolvers.Mutation,
-        ...userResolvers.Mutation
+        ...userResolvers.Mutation,
+        ...commentResolvers.Mutation
     }
 }

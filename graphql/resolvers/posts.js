@@ -14,6 +14,7 @@ module.exports = {
                 throw new Error(err);
             }
         },
+
         async getPost(_, { postId }) {
             const { errors, valid } = validateObjectId(postId);
             if (!valid) {
@@ -30,7 +31,7 @@ module.exports = {
             } catch (err) {
                 throw new Error(err);
             }
-        },
+        }
     },
     Mutation: {
         async createPost(_, { body }, context) {
@@ -46,6 +47,7 @@ module.exports = {
             const post = await newPost.save();
             return post;
         },
+
         async deletePost(_, { postId }, context) {
             const user = checkAuth(context);
             const { errors, valid } = validateObjectId(postId);
@@ -62,6 +64,31 @@ module.exports = {
             } catch (err) {
                 throw new AuthenticationError('Action not allowed');
             }            
-        }   
+        },
+
+        async likePost(_, { postId }, context) {
+            const { username } = checkAuth(context);
+            const { errors, valid } = validateObjectId(postId);
+            if (!valid) {
+                throw new UserInputError('Errors', { errors });
+            }
+
+            const post = await Post.findById(postId);
+            if (!post) {
+                throw new UserInputError('Post not found');
+            }            
+            if (post.likes.find(like => like.username === username)) {
+                // Post already liked. Unlike it
+                post.likes = post.likes.filter(like => like.username !== username);
+                post.save();
+            } else {
+                post.likes.push({
+                    username, 
+                    createdAt: new Date().toISOString()
+                })
+                post.save();
+            }
+            return post;
+        }
     }
 }
